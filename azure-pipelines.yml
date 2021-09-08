@@ -1,0 +1,68 @@
+trigger: none
+
+pool:
+  vmImage: ubuntu-latest
+
+stages:
+- stage: Tests
+  jobs:
+  - job:
+    displayName: Unit tests
+    steps:
+    - script: echo simulate running your unit tests!
+      displayName: 'Run unit tests'
+  - job: 
+    displayName: UI tests
+    steps:
+    - script:  echo simulate running your ui tests!
+      displayName: 'Run unit tests'
+
+- stage: Build
+  dependsOn: [] # This will remove implicit dependency and run in parallel with the stage: Tests above 
+  jobs:
+  - job:
+    displayName: Build the application
+    steps:
+    - script: |
+        echo Running all builds commands...
+        echo ... commands successfully completed.
+      displayName: 'Run build scripts & tasks'
+
+- stage: Dev
+  dependsOn:
+  - Tests
+  - Build
+  jobs:
+  - deployment:
+    displayName: Dev deploy
+    environment: Dev
+    strategy:
+     runOnce:
+       deploy:
+         steps:
+           - script: echo Running in the Dev environment as deployment job
+             displayName: 'Dev based stage'
+
+- stage: Staging
+  jobs:
+  - deployment:
+    displayName: Staging deploy
+    environment: Staging
+    strategy:
+     runOnce:
+       deploy:
+         steps:
+           - script: echo Running in the Staging environment as deployment job
+             displayName: 'Staging based stage'
+
+- stage: Production
+  jobs:
+  - deployment: 
+    displayName: Production deploy
+    environment: Production
+    strategy:
+     runOnce:
+       deploy:
+         steps:
+           - script: echo Running in the Production environment as deployment job
+             displayName: 'Production based stage'
